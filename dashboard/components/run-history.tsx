@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { MonitorRunRecord } from "@/lib/types";
-import { relativeTime } from "@/lib/format";
+import { relativeTime } from "../lib/format";
+import type { MonitorRunRecord } from "../lib/types";
 import { RunStatusBadge, RunTypeBadge } from "./status-badge";
 import { SectionShell } from "./section-shell";
 

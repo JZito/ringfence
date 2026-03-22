@@ -1,6 +1,6 @@
 "use client";
 
-import { relativeTime } from "@/lib/format";
+import { relativeTime } from "../lib/format";
 
 interface RefreshIndicatorProps {
   lastFetchedAt: Date | null;

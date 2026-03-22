@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import type { MaterialAlertRecord, DigestRecord } from "@/lib/types";
-import { relativeTime } from "@/lib/format";
+import { relativeTime } from "../lib/format";
+import type { DigestRecord, MaterialAlertRecord } from "../lib/types";
 import { SectionShell } from "./section-shell";
 
 interface DigestArchiveProps {

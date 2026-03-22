@@ -1,6 +1,6 @@
 import Image from "next/image";
-import type { AgentStatus, MaterialAlertRecord } from "@/lib/types";
-import { relativeTime } from "@/lib/format";
+import { relativeTime } from "../lib/format";
+import type { AgentStatus, MaterialAlertRecord } from "../lib/types";
 import { AgentStatusBadge } from "./status-badge";
 
 interface StatusStripProps {

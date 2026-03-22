@@ -1,5 +1,5 @@
-import type { VaultState } from "@/lib/types";
-import { formatWstETH } from "@/lib/format";
+import { formatWstETH } from "../lib/format";
+import type { VaultState } from "../lib/types";
 import { CopyableAddress } from "./copyable-address";
 import { SectionShell } from "./section-shell";
 

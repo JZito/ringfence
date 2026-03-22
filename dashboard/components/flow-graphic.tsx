@@ -1,5 +1,5 @@
-import { FLOW_STEPS, STEP_TO_FLOW_ID } from "@/lib/constants";
-import type { RecentTx } from "@/lib/types";
+import { FLOW_STEPS, STEP_TO_FLOW_ID } from "../lib/constants";
+import type { RecentTx } from "../lib/types";
 
 interface FlowGraphicProps {
   recentTxs: RecentTx[];

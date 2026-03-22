@@ -1,15 +1,15 @@
 "use client";
 
-import { useDashboardState } from "@/hooks/use-dashboard-state";
-import { RefreshIndicator } from "@/components/refresh-indicator";
-import { StatusStrip } from "@/components/status-strip";
-import { TreasuryCard } from "@/components/treasury-card";
-import { FlowGraphic } from "@/components/flow-graphic";
-import { GovernanceSummary } from "@/components/governance-summary";
-import { RunHistory } from "@/components/run-history";
-import { TransactionHistory } from "@/components/transaction-history";
-import { RecentTopics } from "@/components/recent-topics";
-import { DigestArchive } from "@/components/digest-archive";
+import { DigestArchive } from "../components/digest-archive";
+import { FlowGraphic } from "../components/flow-graphic";
+import { GovernanceSummary } from "../components/governance-summary";
+import { RecentTopics } from "../components/recent-topics";
+import { RefreshIndicator } from "../components/refresh-indicator";
+import { RunHistory } from "../components/run-history";
+import { StatusStrip } from "../components/status-strip";
+import { TransactionHistory } from "../components/transaction-history";
+import { TreasuryCard } from "../components/treasury-card";
+import { useDashboardState } from "../hooks/use-dashboard-state";
 
 function LoadingSkeleton() {
   return (

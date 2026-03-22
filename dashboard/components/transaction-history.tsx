@@ -1,5 +1,5 @@
-import type { RecentTx, PendingApprovalRecord } from "@/lib/types";
-import { relativeTime } from "@/lib/format";
+import { relativeTime } from "../lib/format";
+import type { PendingApprovalRecord, RecentTx } from "../lib/types";
 import { CopyableAddress } from "./copyable-address";
 import { SectionShell } from "./section-shell";
 

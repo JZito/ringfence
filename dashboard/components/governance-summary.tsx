@@ -1,4 +1,4 @@
-import type { MonitoredTopicResult, MonitorRunRecord } from "@/lib/types";
+import type { MonitoredTopicResult, MonitorRunRecord } from "../lib/types";
 import { SectionShell } from "./section-shell";
 
 interface GovernanceSummaryProps {

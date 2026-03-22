@@ -1,4 +1,4 @@
-import type { AgentStatus, MonitorRunStatus } from "@/lib/types";
+import type { AgentStatus, MonitorRunStatus } from "../lib/types";
 
 type BadgeVariant = "green" | "yellow" | "blue" | "red" | "muted";
 

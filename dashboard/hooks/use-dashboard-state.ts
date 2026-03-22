@@ -1,9 +1,9 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { DashboardPublicState } from "@/lib/types";
-import { fetchDashboardState } from "@/lib/api";
-import { REFRESH_INTERVAL_MS } from "@/lib/constants";
+import { fetchDashboardState } from "../lib/api";
+import { REFRESH_INTERVAL_MS } from "../lib/constants";
+import type { DashboardPublicState } from "../lib/types";
 
 interface UseDashboardStateResult {
   data: DashboardPublicState | null;

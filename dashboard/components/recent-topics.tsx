@@ -1,5 +1,5 @@
-import type { MonitoredTopicResult } from "@/lib/types";
-import { relativeTime } from "@/lib/format";
+import { relativeTime } from "../lib/format";
+import type { MonitoredTopicResult } from "../lib/types";
 import { SectionShell } from "./section-shell";
 
 interface RecentTopicsProps {

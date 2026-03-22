@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { truncateAddress, basescanAddressUrl, basescanTxUrl } from "@/lib/format";
+import { basescanAddressUrl, basescanTxUrl, truncateAddress } from "../lib/format";
 
 interface CopyableAddressProps {
   value: string;
