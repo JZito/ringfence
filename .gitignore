@@ -1,0 +1,155 @@
+# -----------------------------
+# OS / Editor
+# -----------------------------
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+.idea/
+.vscode/
+*.iml
+
+# -----------------------------
+# Logs
+# -----------------------------
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# -----------------------------
+# Environment / Secrets
+# -----------------------------
+.env
+.env.*
+!.env.example
+!.env*.example
+!.env*.sample
+
+# Secret-ish common files
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cert
+secrets.json
+wallet.json
+mnemonic.txt
+private-key.txt
+
+# -----------------------------
+# Node / JS / TS
+# -----------------------------
+node_modules/
+.npm/
+.pnpm-store/
+.pnp/
+.pnp.js
+.parcel-cache/
+
+# Build output
+dist/
+build/
+out/
+.next/
+.nuxt/
+.cache/
+coverage/
+*.tsbuildinfo
+
+# Turbo / monorepo
+.turbo/
+
+# -----------------------------
+# Package manager artifacts
+# Keep lockfiles if this is an app/repo, remove these lines if you want them tracked
+# In most cases, you SHOULD track your lockfile. Comment these out if so.
+# -----------------------------
+# package-lock.json
+# yarn.lock
+# pnpm-lock.yaml
+# bun.lockb
+
+# -----------------------------
+# Solidity / Hardhat
+# -----------------------------
+artifacts/
+cache/
+typechain/
+typechain-types/
+
+# Hardhat deploy plugin artifacts if used
+deployments/*/solcInputs/
+deployments/localhost/
+
+# Coverage
+coverage.json
+
+# -----------------------------
+# Foundry
+# -----------------------------
+broadcast/
+cache_forge/
+out/
+forge-cache/
+.anvil/
+lib/
+
+# If using git submodules or want libs tracked, remove lib/ above
+
+# -----------------------------
+# Frontend generated files
+# -----------------------------
+.vercel/
+.netlify/
+
+# -----------------------------
+# Testing / local state
+# -----------------------------
+tmp/
+temp/
+*.pid
+*.seed
+config/runtime-state.json
+config/deployments.json
+
+# Local chain / db files
+*.sqlite
+*.sqlite3
+*.db
+
+# -----------------------------
+# Python (if scripts/agents use Python)
+# -----------------------------
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.python-version
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# -----------------------------
+# Rust (if any tooling)
+# -----------------------------
+target/
+
+# -----------------------------
+# Docker
+# -----------------------------
+.docker/
+docker-compose.override.yml
+
+# -----------------------------
+# Misc
+# -----------------------------
+*.tgz
+*.zip

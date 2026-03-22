@@ -1,0 +1,28 @@
+{
+  "name": "ringfence",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@7.12.2",
+  "engines": {
+    "node": ">=20 <21"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "check": "tsc --noEmit -p tsconfig.json",
+    "cli": "node --import tsx src/index.ts",
+    "serve": "node --import tsx src/index.ts monitor serve",
+    "test:contracts": "forge test",
+    "test:unit": "node --import tsx --test test-ts/*.test.ts",
+    "test": "pnpm run test:contracts && pnpm run test:unit"
+  },
+  "dependencies": {
+    "commander": "^12.1.0",
+    "viem": "^2.21.54"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
