@@ -1,7 +1,7 @@
 {
   "chainId": 8453,
-  "wstETH": "",
-  "usdc": "",
+  "wstETH": "0xc1CBa3fCea344f92D9239c08C0568f6F2F0ee452",
+  "usdc": "0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913",
   "claimRecipient": "",
   "locusWalletAddress": "",
   "slippageBps": 50,
@@ -10,7 +10,7 @@
   "minClaimAmountWstETH": "0.001",
   "maxClaimAmountWstETH": "0",
   "telegramChatId": "",
-  "monitorContractKind": "demo",
+  "monitorContractKind": "production",
   "monitorLookbackHours": 72,
   "monitorMaxTopicsPerRun": 5,
   "monitorDiscoveryMaxPages": 3,
