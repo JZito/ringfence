@@ -130,7 +130,7 @@ export function loadConfig(): RingfenceConfig {
     geminiModel: env("GEMINI_MODEL") ?? defaults.geminiModel,
     dashboardAdminToken: env("DASHBOARD_ADMIN_TOKEN"),
     dashboardHost: env("DASHBOARD_HOST") ?? defaults.dashboardHost,
-    dashboardPort: Number(env("DASHBOARD_PORT") ?? defaults.dashboardPort),
+    dashboardPort: Number(env("PORT") ?? env("DASHBOARD_PORT") ?? defaults.dashboardPort),
     eventLookbackBlocks: BigInt(env("EVENT_LOOKBACK_BLOCKS") ?? defaults.eventLookbackBlocks),
   };
 }
