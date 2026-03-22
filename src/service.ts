@@ -412,6 +412,11 @@ export async function startDashboardService(config: RingfenceConfig) {
     const url = new URL(request.url ?? "/", `http://${request.headers.host ?? `${config.dashboardHost}:${config.dashboardPort}`}`);
 
     try {
+      if (request.method === "GET" && url.pathname === "/health") {
+        sendJson(response, 200, { status: "ok" });
+        return;
+      }
+
       if (request.method === "GET" && url.pathname === "/") {
         sendHtml(response, renderPublicPage());
         return;
