@@ -115,7 +115,6 @@ temp/
 *.pid
 *.seed
 config/runtime-state.json
-config/deployments.json
 
 # Local chain / db files
 *.sqlite
