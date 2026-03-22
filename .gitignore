@@ -97,7 +97,7 @@ cache_forge/
 out/
 forge-cache/
 .anvil/
-lib/
+/lib/
 
 # If using git submodules or want libs tracked, remove lib/ above
 
