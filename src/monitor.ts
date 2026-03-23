@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 
 import { formatAmount, formatUsd, nowIso, stringifyForJson } from "./format.js";
-import { fetchLatestForumTopics } from "./forum.js";
+import { fetchForumTopicDiscussion, fetchLatestForumTopics } from "./forum.js";
 import { readRuntimeState, recordDigest, recordMaterialAlert, recordMonitorRun, updateRuntimeState } from "./history.js";
 import { asChangeLevel, ensureRequiredLocusEndpoints } from "./guards.js";
 import { callDiffbotDiscussion, callGeminiChat, getPendingApproval, getWrappedCatalog } from "./locus.js";
@@ -500,10 +500,32 @@ async function analyzeTopic(
     };
   }
   clearLocusPendingApproval(diffbotStep);
+  let discussionPayload: unknown;
   if (diffbotResponse.status >= 400 || diffbotResponse.body.success === false) {
-    throw new Error(`Diffbot discussion failed for topic ${topic.topicId}: ${JSON.stringify(diffbotResponse.body)}`);
+    const diffbotError = JSON.stringify(diffbotResponse.body);
+    logStep(diffbotStep, "info", {
+      message: `Diffbot failed for ${topic.title}; using forum fallback`,
+      topicId: topic.topicId,
+      url: topic.url,
+      error: diffbotError,
+    });
+    try {
+      discussionPayload = await fetchForumTopicDiscussion(config, topic);
+      logStep(diffbotStep, "ok", {
+        message: `Forum fallback loaded for ${topic.title}`,
+        topicId: topic.topicId,
+        source: "forum_json_fallback",
+      });
+    } catch (fallbackError) {
+      const fallbackMessage = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
+      throw new Error(
+        `Diffbot discussion failed for topic ${topic.topicId}: ${diffbotError}; forum fallback failed: ${fallbackMessage}`,
+      );
+    }
+  } else {
+    discussionPayload = diffbotResponse.body.data ?? diffbotResponse.body;
+    logStep(diffbotStep, "ok", { message: `Diffbot scrape complete for ${topic.title}` });
   }
-  logStep(diffbotStep, "ok", { message: `Diffbot scrape complete for ${topic.title}` });
 
   const geminiStep = `monitor-gemini-${topic.topicId}`;
   logStep(geminiStep, "start", { message: `Gemini classification for ${topic.title}` });
@@ -514,7 +536,7 @@ async function analyzeTopic(
     messages: [
       {
         role: "user",
-        content: buildGeminiPrompt(topic, previous, diffbotResponse.body.data ?? diffbotResponse.body),
+        content: buildGeminiPrompt(topic, previous, discussionPayload),
       },
     ],
     maxOutputTokens: 1_024,
@@ -549,12 +571,18 @@ async function analyzeTopic(
   return { result };
 }
 
-function mapRunStatusToAgentStatus(status: MonitorRunStatus, summary: string): AgentStatus {
-  if (status === "PENDING_APPROVAL") {
+export function deriveAgentStatus(input: {
+  status: MonitorRunStatus;
+  summary: string;
+  allTopicsFailedUpstream?: boolean;
+}): AgentStatus {
+  if (input.status === "PENDING_APPROVAL") {
     return "pending_approval";
   }
-  if (status === "FAILED") {
-    return summary.includes("below the configured buffer") ? "degraded" : "failed";
+  if (input.status === "FAILED") {
+    return input.allTopicsFailedUpstream || input.summary.includes("below the configured buffer")
+      ? "degraded"
+      : "failed";
   }
   return "healthy";
 }
@@ -719,7 +747,7 @@ export async function runHourlyMonitor(
           discoveredTopics,
           results,
           alertSentResults: [],
-          agentStatus: analysisFailures.length > 0 ? "degraded" : "pending_approval",
+          agentStatus: deriveAgentStatus({ status: run.status, summary: run.summary }),
         });
         return run;
       }
@@ -747,7 +775,11 @@ export async function runHourlyMonitor(
         discoveredTopics,
         results: [],
         alertSentResults: [],
-        agentStatus: "degraded",
+        agentStatus: deriveAgentStatus({
+          status: run.status,
+          summary: run.summary,
+          allTopicsFailedUpstream: true,
+        }),
       });
       logStep("monitor-hourly", "error", {
         message: run.summary,
@@ -813,7 +845,7 @@ export async function runHourlyMonitor(
       discoveredTopics,
       results,
       alertSentResults: alertedResults,
-      agentStatus: analysisFailures.length > 0 ? "degraded" : mapRunStatusToAgentStatus(run.status, run.summary),
+      agentStatus: deriveAgentStatus({ status: run.status, summary: run.summary }),
     });
     logStep("monitor-hourly", "ok", {
       message: run.summary,
@@ -846,7 +878,7 @@ export async function runHourlyMonitor(
       discoveredTopics,
       results,
       alertSentResults: [],
-      agentStatus: mapRunStatusToAgentStatus(run.status, run.summary),
+      agentStatus: deriveAgentStatus({ status: run.status, summary: run.summary }),
     });
     logStep("monitor-hourly", "error", { message, runId, contractKind });
     throw error;
@@ -940,6 +972,7 @@ export async function runDailyDigest(
 
 export async function buildDashboardPublicState(config: RingfenceConfig): Promise<DashboardPublicState> {
   const runtimeState = readRuntimeState();
+  const latestRun = runtimeState.monitor.runHistory[0];
   const [production, demo, productionEvents, demoEvents] = await Promise.all([
     config.contractAddresses.production ? readVaultState(config, "production").catch(() => undefined) : Promise.resolve(undefined),
     config.contractAddresses.demo ? readVaultState(config, "demo").catch(() => undefined) : Promise.resolve(undefined),
@@ -962,7 +995,9 @@ export async function buildDashboardPublicState(config: RingfenceConfig): Promis
 
   return {
     monitorContractKind: config.monitorContractKind,
-    agentStatus: runtimeState.monitor.latestStatus ?? "degraded",
+    agentStatus:
+      runtimeState.monitor.latestStatus ??
+      (latestRun ? deriveAgentStatus({ status: latestRun.status, summary: latestRun.summary }) : "healthy"),
     generatedAt: nowIso(),
     production,
     demo,

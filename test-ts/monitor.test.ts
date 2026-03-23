@@ -4,6 +4,7 @@ import assert from "node:assert/strict";
 import {
   buildRunSummary,
   collectDigestTopicResults,
+  deriveAgentStatus,
   deriveOverallChangeLevel,
   detectChangedTopics,
   shouldSendMaterialAlert,
@@ -170,4 +171,25 @@ test("buildRunSummary includes upstream analysis failures without discarding suc
   assert.match(summary, /1 topic\(s\) analyzed: Topic A/);
   assert.match(summary, /1 additional changed topics were skipped this run/);
   assert.match(summary, /1 topic\(s\) failed upstream analysis: Topic B/);
+});
+
+test("deriveAgentStatus keeps successful runs healthy despite partial upstream failures", () => {
+  assert.equal(
+    deriveAgentStatus({
+      status: "MATERIAL",
+      summary: "Material Lido governance change detected. 1 topic(s) failed upstream analysis: Topic B.",
+    }),
+    "healthy",
+  );
+});
+
+test("deriveAgentStatus marks all-upstream analysis failures as degraded", () => {
+  assert.equal(
+    deriveAgentStatus({
+      status: "FAILED",
+      summary: "No recent Lido governance changes detected. 5 topic(s) failed upstream analysis: Topic B.",
+      allTopicsFailedUpstream: true,
+    }),
+    "degraded",
+  );
 });
