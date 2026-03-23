@@ -104,7 +104,6 @@ export interface DashboardPublicState {
   treasuryProtectionSummary: Record<string, string | undefined>;
   locusBalance?: string;
   locusWalletAddress?: string;
-  telegramChatId?: string;
   latestPublicSummary?: string;
   lastHourlyRunAt?: string;
   lastDailyDigestAt?: string;

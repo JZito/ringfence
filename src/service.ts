@@ -260,7 +260,6 @@ function renderPublicPage(): string {
             + '<div class="item"><span class="muted">Last daily digest</span><div>' + escapeHtml(state.lastDailyDigestAt || 'never') + '</div></div>'
             + '<div class="item"><span class="muted">Locus balance</span><div>' + escapeHtml(state.locusBalance || 'not configured') + '</div></div>'
             + '<div class="item"><span class="muted">Locus wallet</span><div class="mono">' + escapeHtml(state.locusWalletAddress || 'not configured') + '</div></div>'
-            + '<div class="item"><span class="muted">Telegram chat</span><div class="mono">' + escapeHtml(state.telegramChatId || 'not configured') + '</div></div>'
             + '<div class="item"><span class="muted">Generated</span><div>' + escapeHtml(state.generatedAt) + '</div></div>'
             + '</div></div>',
           renderVaultCard('Production Vault', state.production, state.treasuryProtectionSummary.production),

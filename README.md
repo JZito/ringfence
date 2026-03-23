@@ -1,8 +1,8 @@
 # Ringfence
 
-**Ringfence is a self-funding operating system for AI agents separating capital from computation.**
+**Ringfence is a yield-backed operating treasury for AI agents separating capital from computation.**
 
-It separates **principal from yield**, enforces that separation **onchain**, and allows agents to **continuously fund their own existence** by paying for compute, data, and communication without ever being able to spend the underlying capital.
+It separates **principal from yield**, enforces that separation **onchain**, and allows agents to fund ongoing compute, data, and communication costs without ever being able to spend the underlying capital.
 
 This repository runs Ringfence as a **live system**:
 
@@ -27,7 +27,7 @@ Most agent systems today:
 
 Ringfence changes that model:
 
-> **Agents can operate with real budgets indefinitely, without ever taking custody of capital.**
+> **Agents can operate with real budgets without ever taking custody of capital.**
 
 In this deployment:
 
@@ -37,13 +37,13 @@ In this deployment:
 - the agent converts yield -> USDC -> pays for external services
 - the system runs continuously and publishes its behavior publicly
 
-This is the primitive behind **persistent agents**, **self-funding infrastructure**, and **autonomous digital services that do not need custody of their own capital**.
+This is the primitive behind **persistent agents**, **yield-backed infrastructure**, and **autonomous digital services that do not need custody of their own capital**.
 
 ## Live System
 
 ### Public Endpoints
 
-- Public dashboard: [ringfence-production.up.railway.app](https://ringfence-production.up.railway.app)
+- Public dashboard: [ringfence-zeta.vercel.app](https://ringfence-zeta.vercel.app/)
 - Lido governance forum source: [research.lido.fi](https://research.lido.fi/)
 
 ### Base Mainnet Deployment
@@ -57,7 +57,7 @@ This is the primitive behind **persistent agents**, **self-funding infrastructur
 
 The production vault is funded and accruing real yield.
 
-The system is continuously running and updating the public dashboard.
+The system is running live and updating the public dashboard.
 
 The demo harness is used solely to initiate the live execution loop and allow the system behavior to be continuously demonstrable.
 
@@ -194,16 +194,6 @@ All transactions are public and verifiable.
 - Uniswap Base swap: [`0x6451fb28ec1468499c20951bca51466ad0d29a1e201b6b054d5baa9a3f680328`](https://basescan.org/tx/0x6451fb28ec1468499c20951bca51466ad0d29a1e201b6b054d5baa9a3f680328)
 - Locus top-up: [`0xf5fa1a9930ab958c8144132769a9616db08e8cd706e5818a0400544ab75e3e93`](https://basescan.org/tx/0xf5fa1a9930ab958c8144132769a9616db08e8cd706e5818a0400544ab75e3e93)
 
-### Current Live State Snapshot (as of Sun, March 22nd 23:00 UTC)
-
-- Production vault: `0.1 wstETH`
-- Production principal baseline: `0.122999872513851591 stETH-value`
-- Production claimable: `0`
-- Demo vault: `0.009 wstETH`
-- Demo principal baseline: `0.012299987251385159 stETH-value`
-- Demo effective baseline: `0.010799987251385159 stETH-value`
-- Demo claimable after one claim: `0.000219 wstETH`
-
 ## Dashboard
 
 The system exposes a public, read-only dashboard showing:
@@ -224,12 +214,13 @@ The dashboard reflects the live state of the agent and treasury.
 ### Core
 
 ```bash
+pnpm run cli -- state --contract demo
 pnpm run cli -- state --contract production
-pnpm run cli -- owner deposit --contract demo --amount 0.05
 pnpm run cli -- owner set-agent --contract demo --agent 0x...
 pnpm run cli -- owner whitelist --contract demo --recipient 0x... --allowed true
-pnpm run cli -- owner set-cap --contract demo --amount 0.01
-pnpm run cli -- owner demo-grant-delta --amount 0.005
+pnpm run cli -- owner set-cap --contract demo --amount 0.001
+pnpm run cli -- owner deposit --contract demo --amount 0.01
+pnpm run cli -- owner demo-grant-delta --amount 0.0015
 pnpm run cli -- owner demo-reset-delta
 ```
 
@@ -237,9 +228,9 @@ pnpm run cli -- owner demo-reset-delta
 
 ```bash
 pnpm run cli -- agent claim --contract demo
-pnpm run cli -- agent approve-swap --amount 0.005
-pnpm run cli -- agent swap --amount 0.005
-pnpm run cli -- agent topup-locus --amount 5
+pnpm run cli -- agent approve-swap --amount 0.001
+pnpm run cli -- agent swap --amount 0.001
+pnpm run cli -- agent topup-locus --amount 1
 ```
 
 ### Monitor
@@ -255,6 +246,7 @@ pnpm run serve
 
 ```bash
 pnpm run cli -- demo fail-claim --contract demo --amount 1 --recipient 0x...
+pnpm run cli -- demo fail-withdraw-principal --contract demo --amount 0.001 --recipient 0x...
 pnpm run cli -- locus smoke --topic-url https://research.lido.fi/t/... 
 ```
 

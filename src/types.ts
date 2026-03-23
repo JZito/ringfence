@@ -377,7 +377,6 @@ export interface DashboardPublicState {
   treasuryProtectionSummary: Record<ContractKind, string | undefined>;
   locusBalance?: string;
   locusWalletAddress?: string;
-  telegramChatId?: string;
   latestPublicSummary?: string;
   lastHourlyRunAt?: string;
   lastDailyDigestAt?: string;

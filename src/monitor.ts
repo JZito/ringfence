@@ -1048,7 +1048,6 @@ export async function buildDashboardPublicState(config: RingfenceConfig): Promis
     },
     locusBalance,
     locusWalletAddress,
-    telegramChatId: config.telegramChatId || undefined,
     latestPublicSummary: stickyTopics.latestPublicSummary,
     lastHourlyRunAt: runtimeState.monitor.lastHourlyRunAt,
     lastDailyDigestAt: runtimeState.monitor.lastDigestSentAt,
