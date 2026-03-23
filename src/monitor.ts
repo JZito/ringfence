@@ -587,6 +587,42 @@ export function deriveAgentStatus(input: {
   return "healthy";
 }
 
+export function deriveStickyDashboardTopics(input: {
+  latestChangedTopics: MonitoredTopicResult[];
+  latestPublicSummary?: string;
+  runHistory: MonitorRunRecord[];
+}): {
+  latestChangedTopics: MonitoredTopicResult[];
+  latestPublicSummary?: string;
+  isStickyFallback: boolean;
+} {
+  if (input.latestChangedTopics.length > 0) {
+    return {
+      latestChangedTopics: input.latestChangedTopics,
+      latestPublicSummary: input.latestPublicSummary,
+      isStickyFallback: false,
+    };
+  }
+
+  const fallbackRun = input.runHistory.find((run) =>
+    (run.runType === "hourly" || run.runType === "manual_hourly") && run.topicResults.length > 0,
+  );
+
+  if (!fallbackRun) {
+    return {
+      latestChangedTopics: input.latestChangedTopics,
+      latestPublicSummary: input.latestPublicSummary,
+      isStickyFallback: false,
+    };
+  }
+
+  return {
+    latestChangedTopics: fallbackRun.topicResults,
+    latestPublicSummary: fallbackRun.summary,
+    isStickyFallback: true,
+  };
+}
+
 function persistHourlyRun(input: {
   run: MonitorRunRecord;
   discoveredTopics: ForumTopicRecord[];
@@ -973,6 +1009,11 @@ export async function runDailyDigest(
 export async function buildDashboardPublicState(config: RingfenceConfig): Promise<DashboardPublicState> {
   const runtimeState = readRuntimeState();
   const latestRun = runtimeState.monitor.runHistory[0];
+  const stickyTopics = deriveStickyDashboardTopics({
+    latestChangedTopics: runtimeState.monitor.latestChangedTopics,
+    latestPublicSummary: runtimeState.monitor.latestPublicSummary,
+    runHistory: runtimeState.monitor.runHistory,
+  });
   const [production, demo, productionEvents, demoEvents] = await Promise.all([
     config.contractAddresses.production ? readVaultState(config, "production").catch(() => undefined) : Promise.resolve(undefined),
     config.contractAddresses.demo ? readVaultState(config, "demo").catch(() => undefined) : Promise.resolve(undefined),
@@ -1008,10 +1049,10 @@ export async function buildDashboardPublicState(config: RingfenceConfig): Promis
     locusBalance,
     locusWalletAddress,
     telegramChatId: config.telegramChatId || undefined,
-    latestPublicSummary: runtimeState.monitor.latestPublicSummary,
+    latestPublicSummary: stickyTopics.latestPublicSummary,
     lastHourlyRunAt: runtimeState.monitor.lastHourlyRunAt,
     lastDailyDigestAt: runtimeState.monitor.lastDigestSentAt,
-    latestChangedTopics: runtimeState.monitor.latestChangedTopics,
+    latestChangedTopics: stickyTopics.latestChangedTopics,
     materialAlerts: runtimeState.monitor.materialAlerts,
     digests: runtimeState.monitor.digests,
     recentRuns: runtimeState.monitor.runHistory,

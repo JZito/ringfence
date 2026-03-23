@@ -5,12 +5,14 @@ interface GovernanceSummaryProps {
   latestPublicSummary?: string;
   latestChangedTopics: MonitoredTopicResult[];
   recentRuns: MonitorRunRecord[];
+  isStickyFallback?: boolean;
 }
 
 export function GovernanceSummary({
   latestPublicSummary,
   latestChangedTopics,
   recentRuns,
+  isStickyFallback = false,
 }: GovernanceSummaryProps) {
   const latestRun = recentRuns[0];
   const topTopic = latestChangedTopics[0];
@@ -42,10 +44,16 @@ export function GovernanceSummary({
           <p className="text-sm text-text-muted">System healthy — monitoring active. No material governance changes detected.</p>
         )}
 
+        {isStickyFallback && topTopic && (
+          <p className="text-xs text-text-muted">
+            Showing the most recent non-empty hourly monitoring result while the latest run is quiet.
+          </p>
+        )}
+
         {topTopic && (
           <div className="border-t border-border pt-3 space-y-2">
             <div className="flex items-center gap-2">
-              <span className="text-xs text-text-muted">Latest material topic</span>
+              <span className="text-xs text-text-muted">Most recent notable topic</span>
               <span
                 className={`text-[10px] font-mono px-1.5 py-0.5 rounded border ${
                   topTopic.changeLevel === "MATERIAL"

@@ -4,13 +4,21 @@ import { SectionShell } from "./section-shell";
 
 interface RecentTopicsProps {
   topics: MonitoredTopicResult[];
+  isStickyFallback?: boolean;
 }
 
-export function RecentTopics({ topics }: RecentTopicsProps) {
+export function RecentTopics({ topics, isStickyFallback = false }: RecentTopicsProps) {
   const visible = topics.slice(0, 5);
 
   return (
-    <SectionShell title="Recent Topics" subtitle="Latest monitored governance discussions">
+    <SectionShell
+      title="Recent Topics"
+      subtitle={
+        isStickyFallback
+          ? "Showing the most recent non-empty hourly monitoring result"
+          : "Latest monitored governance discussions"
+      }
+    >
       {visible.length === 0 ? (
         <p className="text-sm text-text-muted">No governance activity detected in monitoring window</p>
       ) : (

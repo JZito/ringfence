@@ -10,6 +10,7 @@ import { StatusStrip } from "../components/status-strip";
 import { TransactionHistory } from "../components/transaction-history";
 import { TreasuryCard } from "../components/treasury-card";
 import { useDashboardState } from "../hooks/use-dashboard-state";
+import type { DashboardPublicState, MonitorRunRecord } from "../lib/types";
 
 function LoadingSkeleton() {
   return (
@@ -42,9 +43,29 @@ function ErrorBanner({ error, onRetry }: { error: string; onRetry: () => void })
   );
 }
 
+function isHourlyRun(run: MonitorRunRecord): boolean {
+  return run.runType === "hourly" || run.runType === "manual_hourly";
+}
+
+function getStickyTopics(data: DashboardPublicState) {
+  if (data.latestChangedTopics.length > 0) {
+    return { topics: data.latestChangedTopics, isFallback: false };
+  }
+
+  const fallbackRun = data.recentRuns.find(
+    (run) => isHourlyRun(run) && run.topicResults.length > 0,
+  );
+
+  return {
+    topics: fallbackRun?.topicResults ?? [],
+    isFallback: Boolean(fallbackRun),
+  };
+}
+
 export default function DashboardPage() {
   const { data, error, isLoading, lastFetchedAt, secondsUntilRefresh, refresh } =
     useDashboardState();
+  const stickyTopics = data ? getStickyTopics(data) : null;
 
   return (
     <main className="max-w-[1200px] mx-auto px-4 py-6 space-y-4">
@@ -83,8 +104,9 @@ export default function DashboardPage() {
 
           <GovernanceSummary
             latestPublicSummary={data.latestPublicSummary}
-            latestChangedTopics={data.latestChangedTopics}
+            latestChangedTopics={stickyTopics?.topics ?? []}
             recentRuns={data.recentRuns}
+            isStickyFallback={stickyTopics?.isFallback ?? false}
           />
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -95,7 +117,10 @@ export default function DashboardPage() {
             />
           </div>
 
-          <RecentTopics topics={data.latestChangedTopics} />
+          <RecentTopics
+            topics={stickyTopics?.topics ?? []}
+            isStickyFallback={stickyTopics?.isFallback ?? false}
+          />
 
           <DigestArchive
             materialAlerts={data.materialAlerts}

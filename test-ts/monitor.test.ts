@@ -5,6 +5,7 @@ import {
   buildRunSummary,
   collectDigestTopicResults,
   deriveAgentStatus,
+  deriveStickyDashboardTopics,
   deriveOverallChangeLevel,
   detectChangedTopics,
   shouldSendMaterialAlert,
@@ -192,4 +193,31 @@ test("deriveAgentStatus marks all-upstream analysis failures as degraded", () =>
     }),
     "degraded",
   );
+});
+
+test("deriveStickyDashboardTopics falls back to the most recent non-empty hourly run", () => {
+  const sticky = deriveStickyDashboardTopics({
+    latestChangedTopics: [],
+    latestPublicSummary: "No recent Lido governance changes detected.",
+    runHistory: [
+      run({
+        runId: "run-empty",
+        startedAt: "2026-03-21T18:00:00.000Z",
+        status: "NONE",
+        summary: "No recent Lido governance changes detected.",
+        topicResults: [],
+      }),
+      run({
+        runId: "run-material",
+        startedAt: "2026-03-21T17:00:00.000Z",
+        status: "MATERIAL",
+        summary: "Material Lido governance change detected.",
+        topicResults: [result({ topicId: 99, title: "Sticky topic", changeLevel: "MATERIAL" })],
+      }),
+    ],
+  });
+
+  assert.equal(sticky.isStickyFallback, true);
+  assert.equal(sticky.latestPublicSummary, "Material Lido governance change detected.");
+  assert.deepEqual(sticky.latestChangedTopics.map((topic) => topic.topicId), [99]);
 });
