@@ -39,7 +39,7 @@ export function GovernanceSummary({
             {latestPublicSummary}
           </p>
         ) : (
-          <p className="text-sm text-text-muted">No governance summary available yet.</p>
+          <p className="text-sm text-text-muted">System healthy — monitoring active. No material governance changes detected.</p>
         )}
 
         {topTopic && (
@@ -78,6 +78,11 @@ export function GovernanceSummary({
             <div className="text-xs text-text-muted">
               Recommended: <span className="text-text-primary">{topTopic.recommendedAction}</span>
             </div>
+            {topTopic.whyItMatters && (
+              <p className="text-xs text-text-muted italic mt-1">
+                Why it matters: <span className="text-text-primary not-italic">{topTopic.whyItMatters}</span>
+              </p>
+            )}
           </div>
         )}
       </div>

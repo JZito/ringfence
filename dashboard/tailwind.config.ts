@@ -41,9 +41,14 @@ const config: Config = {
           "0%, 100%": { opacity: "1" },
           "50%": { opacity: "0.6" },
         },
+        border_glow: {
+          "0%, 100%": { borderColor: "rgba(125, 184, 143, 0.2)", boxShadow: "0 0 8px rgba(125, 184, 143, 0.1)" },
+          "50%": { borderColor: "rgba(125, 184, 143, 0.4)", boxShadow: "0 0 12px rgba(125, 184, 143, 0.2)" },
+        },
       },
       animation: {
         pulse_slow: "pulse_slow 2.5s ease-in-out infinite",
+        border_glow: "border_glow 4s ease-in-out infinite",
       },
     },
   },

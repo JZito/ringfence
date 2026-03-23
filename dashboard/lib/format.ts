@@ -50,3 +50,17 @@ export function basescanTxUrl(hash: string): string {
 export function basescanAddressUrl(addr: string): string {
   return `${BASE_EXPLORER_URL}/address/${addr}`;
 }
+
+export function relativeTimeUntil(lastRunIso: string, intervalMinutes: number): string {
+  const then = new Date(lastRunIso).getTime();
+  if (isNaN(then)) return "unknown";
+  const nextRun = then + intervalMinutes * 60_000;
+  const diffMs = nextRun - Date.now();
+  if (diffMs <= 0) return "imminent";
+  const minutes = Math.ceil(diffMs / 60_000);
+  if (minutes >= 60) {
+    const hours = Math.floor(minutes / 60);
+    return `in ${hours}h ${minutes % 60}m`;
+  }
+  return `in ${minutes}m`;
+}

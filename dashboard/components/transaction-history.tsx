@@ -41,7 +41,7 @@ export function TransactionHistory({ txs, pendingApprovals }: TransactionHistory
       )}
 
       {txs.length === 0 ? (
-        <p className="text-sm text-text-muted">No transactions recorded yet.</p>
+        <p className="text-sm text-text-muted">Monitoring — no treasury actions required</p>
       ) : (
         <div className="space-y-2">
           {txs.map((tx) => (

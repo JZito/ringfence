@@ -56,7 +56,7 @@ export function DigestArchive({ materialAlerts, digests }: DigestArchiveProps) {
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       <SectionShell title="Material Alerts">
         {materialAlerts.length === 0 ? (
-          <p className="text-sm text-text-muted">No material alerts sent yet.</p>
+          <p className="text-sm text-text-muted">No material governance changes detected</p>
         ) : (
           <div className="space-y-2">
             {materialAlerts.map((alert) => (
@@ -74,7 +74,7 @@ export function DigestArchive({ materialAlerts, digests }: DigestArchiveProps) {
 
       <SectionShell title="Daily Digests">
         {digests.length === 0 ? (
-          <p className="text-sm text-text-muted">No daily digests sent yet.</p>
+          <p className="text-sm text-text-muted">Awaiting first daily digest cycle</p>
         ) : (
           <div className="space-y-2">
             {digests.map((digest) => (

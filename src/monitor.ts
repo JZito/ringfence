@@ -269,14 +269,21 @@ function renderTopicBlock(result: MonitoredTopicResult): string {
 }
 
 function renderTopicBlockHtml(result: MonitoredTopicResult): string {
+  const riskTags = result.riskTags.length > 0 ? result.riskTags.join(", ") : "none";
   return [
-    `<b>${escapeTelegramHtml(result.title)}</b>`,
-    `<a href="${escapeTelegramHtml(result.url)}">Open topic</a>`,
-    `• <b>Level</b>: ${escapeTelegramHtml(result.changeLevel)}`,
-    `• <b>Summary</b>: ${escapeTelegramHtml(result.summary)}`,
-    `• <b>Why it matters</b>: ${escapeTelegramHtml(result.whyItMatters)}`,
-    `• <b>Recommended action</b>: ${escapeTelegramHtml(result.recommendedAction)}`,
-    `• <b>Risk tags</b>: ${escapeTelegramHtml(result.riskTags.length > 0 ? result.riskTags.join(", ") : "none")}`,
+    `<b>Topic</b>`,
+    `<a href="${escapeTelegramHtml(result.url)}">${escapeTelegramHtml(result.title)}</a>`,
+    "",
+    `<b>Assessment</b>`,
+    `• Level: <b>${escapeTelegramHtml(result.changeLevel)}</b>`,
+    `• Action: <b>${escapeTelegramHtml(result.recommendedAction)}</b>`,
+    `• Risk tags: ${escapeTelegramHtml(riskTags)}`,
+    "",
+    `<b>Summary</b>`,
+    `${escapeTelegramHtml(result.summary)}`,
+    "",
+    `<b>Why it matters</b>`,
+    `${escapeTelegramHtml(result.whyItMatters)}`,
   ].join("\n");
 }
 
@@ -298,10 +305,15 @@ function buildMaterialAlertBody(input: {
 
   const text = lines.join("\n").trim();
   const html = [
-    `<b>Monitoring treasury</b>: ${escapeTelegramHtml(input.contractKind)}`,
-    `<b>Principal protection</b>: ${escapeTelegramHtml(input.treasuryProtection)}`,
+    `<b>Monitoring treasury</b>`,
+    `<code>${escapeTelegramHtml(input.contractKind)}</code>`,
     "",
-    ...input.topicResults.flatMap((result, index) => (index === 0 ? [renderTopicBlockHtml(result)] : ["", renderTopicBlockHtml(result)])),
+    `<b>Principal protection</b>`,
+    `${escapeTelegramHtml(input.treasuryProtection)}`,
+    "",
+    ...input.topicResults.flatMap((result, index) =>
+      index === 0 ? [renderTopicBlockHtml(result)] : ["", "────────────", "", renderTopicBlockHtml(result)],
+    ),
   ].join("\n").trim();
   return { text, html };
 }
@@ -342,11 +354,14 @@ function buildDigestBody(input: {
 
   const text = lines.join("\n").trim();
   const htmlLines = [
-    `<b>Monitoring treasury</b>: ${escapeTelegramHtml(input.contractKind)}`,
-    `<b>Principal protection</b>: ${escapeTelegramHtml(input.treasuryProtection)}`,
+    `<b>Monitoring treasury</b>`,
+    `<code>${escapeTelegramHtml(input.contractKind)}</code>`,
+    "",
+    `<b>Principal protection</b>`,
+    `${escapeTelegramHtml(input.treasuryProtection)}`,
   ];
   if (input.overflowCount > 0) {
-    htmlLines.push(`<b>Skipped changed topics</b>: ${escapeTelegramHtml(String(input.overflowCount))}`);
+    htmlLines.push("", `<b>Skipped changed topics</b>`, `${escapeTelegramHtml(String(input.overflowCount))}`);
   }
   htmlLines.push("");
   if (input.results.length === 0) {
@@ -354,7 +369,7 @@ function buildDigestBody(input: {
   } else {
     for (const [index, result] of input.results.entries()) {
       if (index > 0) {
-        htmlLines.push("");
+        htmlLines.push("", "────────────", "");
       }
       htmlLines.push(renderTopicBlockHtml(result));
     }

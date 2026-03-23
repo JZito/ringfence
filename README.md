@@ -1,146 +1,297 @@
 # Ringfence
 
-Ringfence is a yield-backed operating treasury for AI agents. It uses `wstETH` as the backing asset, protects principal at the contract level, allows only bounded spendable value to flow to the agent, converts that spendable value into `USDC` via Uniswap on Base, and executes real payments through Locus.
+**Ringfence is a self-funding operating system for AI agents separating capital from computation.**
 
-This repo now runs Ringfence as a live Lido governance monitor:
-- a public dashboard shows treasury state, recent governance changes, alerts, digests, and onchain/runtime activity
-- an hourly monitor watches the Lido governance forum
-- `MATERIAL` changes trigger immediate Telegram alerts
-- a daily digest goes out at `18:00 UTC`
-- the monitor only refills its Locus budget when the configured USDC buffer is low
+It separates **principal from yield**, enforces that separation **onchain**, and allows agents to **continuously fund their own existence** by paying for compute, data, and communication without ever being able to spend the underlying capital.
 
-## Repo Shape
+This repository runs Ringfence as a **live system**:
 
-- `contracts/`: `RingfenceProduction` and `RingfenceDemoHarness`
-- `script/`: Foundry deployment script
-- `test/`: Solidity unit and fork tests
-- `src/`: TypeScript CLI, monitor runtime, and dashboard service
-- `docs/`: architecture and judging/demo notes
-- `config/`: defaults, deployments, and persisted runtime state
+- a yield-backed treasury (`wstETH` on Base)
+- an autonomous agent that monitors Lido governance
+- a funding loop that converts yield -> USDC -> paid intelligence
+- a public dashboard showing system state and activity
 
-## Architecture
+> This is not a mock.
+>
+> Ringfence runs on **Base mainnet**, holds real `wstETH`, executes real swaps via **Uniswap**, pays for real analysis through **Locus**, and sends live alerts via **Telegram**.
+>
+> Every step in the loop is executed with real assets, real APIs, and publicly verifiable transactions.
+
+## Why Ringfence
+
+Most agent systems today:
+
+- require pre-funded wallets
+- can drain capital through error, compromise, or bad incentives
+- are economically finite
+
+Ringfence changes that model:
+
+> **Agents can operate with real budgets indefinitely, without ever taking custody of capital.**
+
+In this deployment:
+
+- principal is **structurally inaccessible** to the agent
+- only **derived yield** becomes spendable
+- spend is **bounded and permissioned onchain**
+- the agent converts yield -> USDC -> pays for external services
+- the system runs continuously and publishes its behavior publicly
+
+This is the primitive behind **persistent agents**, **self-funding infrastructure**, and **autonomous digital services that do not need custody of their own capital**.
+
+## Live System
+
+### Public Endpoints
+
+- Public dashboard: [ringfence-production.up.railway.app](https://ringfence-production.up.railway.app)
+- Lido governance forum source: [research.lido.fi](https://research.lido.fi/)
+
+### Base Mainnet Deployment
+
+- Chain: `Base`
+- Owner / deployer: [`0x545e724cb534777c28F518698D0190704ceb55AB`](https://basescan.org/address/0x545e724cb534777c28F518698D0190704ceb55AB)
+- Agent: [`0x56D96e30A02aC5839b37f2Ce33605eE6de11B704`](https://basescan.org/address/0x56D96e30A02aC5839b37f2Ce33605eE6de11B704)
+- Production contract: [`0x23ab3A219952398cADF954AD392E8dB756D8607f`](https://basescan.org/address/0x23ab3A219952398cADF954AD392E8dB756D8607f)
+- Demo contract: [`0xa45eEDa937E58eC51Ea967C415afbEcEE9e95a36`](https://basescan.org/address/0xa45eEDa937E58eC51Ea967C415afbEcEE9e95a36)
+- `wstETH/stETH` rate feed: [`0xB88BAc61a4Ca37C43a3725912B1f472c9A5bc061`](https://basescan.org/address/0xB88BAc61a4Ca37C43a3725912B1f472c9A5bc061)
+
+The production vault is funded and accruing real yield.
+
+The system is continuously running and updating the public dashboard.
+
+The demo harness is used solely to initiate the live execution loop and allow the system behavior to be continuously demonstrable.
+
+## Live Behavior
+
+Ringfence is not a static demo. It is an **always-on system**.
+
+### Every Hour
+
+1. Monitor the Lido governance forum.
+2. Detect new or changed discussions.
+3. If changes exist:
+   - fund Locus conditionally
+   - scrape and analyze discussions
+   - classify impact
+4. Publish results to the dashboard.
+5. Send alerts if needed.
+
+### Notifications
+
+- `MATERIAL` -> immediate Telegram alert
+- Daily digest -> `18:00 UTC`
+
+### Funding
+
+- yield is claimed only when needed
+- swaps execute via Uniswap on Base
+- `USDC` funds Locus for Diffbot + Gemini
+
+## System Loop
 
 ```mermaid
 flowchart LR
-  owner["Owner EOA"] -->|deposit wstETH| prod["RingfenceProduction"]
-  owner -->|deposit wstETH| demo["RingfenceDemoHarness"]
-  owner -->|demoGrantSpendableDelta| demo
-  forum["Lido governance forum\nlatest.json + thread pages"] -->|discover changes| monitor["Ringfence monitor service"]
-  monitor -->|claim spendable wstETH| demo
-  monitor -->|quote + swap| uniswap["Uniswap Trading API + Base swap"]
-  uniswap -->|USDC| agent["Agent EOA"]
-  agent -->|USDC transfer| locusWallet["Locus wallet"]
-  monitor -->|Diffbot discussion| locus["Locus wrapped APIs"]
-  monitor -->|Gemini classification| locus
-  monitor -->|Telegram alert + digest| telegram["Telegram Bot API"]
-  monitor --> dashboard["Public dashboard"]
-  prod --> dashboard
-  demo --> dashboard
+  vault["Vault (wstETH)"]
+  yield["Accrued Yield"]
+  swap["Uniswap Swap (USDC)"]
+  locus["Locus (Diffbot + Gemini)"]
+  monitor["Governance Monitor"]
+  dashboard["Public Dashboard"]
+  telegram["Telegram Alerts"]
+
+  vault --> yield --> swap --> locus --> monitor --> dashboard
+  monitor --> telegram
 ```
 
-See [docs/architecture.md](docs/architecture.md).
+## Architecture
+
+Ringfence combines an **onchain treasury invariant** with an **offchain agent runtime**.
+
+### Onchain
+
+- value-based principal accounting in `stETH` terms
+- strict agent permissions through whitelist + per-transaction cap
+- claimable yield derived from real market value
+- owner-controlled principal recovery
+
+### Offchain
+
+- TypeScript agent runtime and CLI
+- Uniswap Trading API integration
+- Locus paid API usage for Diffbot + Gemini
+- Telegram broadcasting
+- persistent monitor state and public dashboard
 
 ## Contracts
 
 ### `RingfenceProduction`
 
-- stores `principalBaseline` in stETH-value terms
-- derives Base-mainnet `wstETH` value from the `wstETH/stETH` rate feed
-- computes claimable `wstETH` from `currentPositionValue - principalBaseline`
-- enforces owner-only config, agent-only claim, whitelist, and per-tx cap
-- contains no demo backdoor
+The canonical primitive:
+
+- principal stored as a `stETH`-value baseline
+- claimable = `max(current value - baseline, 0)`
+- agent can only claim bounded yield
+
+Includes:
+
+- whitelist enforcement
+- per-transaction cap
+- oracle-based valuation via Chainlink-compatible rate feed
+- owner-only principal withdrawal
+- stale oracle protection
 
 ### `RingfenceDemoHarness`
 
-- preserves the production interface and checks
-- adds explicit `demoGrantSpendableDelta(uint256 deltaStETH)`
-- adds explicit `demoResetSpendableDelta()` for repeatable demos
-- exposes `demoSpendableDeltaStETH()` onchain
-- does not claim to represent fresh accrued Lido yield
+The same surface, plus:
 
-## Monitor Flow
+- explicit demo-only spendable delta
+- repeatable live execution loop
+- no hidden behavior
 
-1. Discover recent Lido governance topics from `https://research.lido.fi/latest.json`.
-2. Compare the forum feed against persisted topic snapshots.
-3. If nothing changed, record a `NONE` heartbeat and stop.
-4. If topics changed:
-   - ensure the Locus USDC buffer is funded; refill from Ringfence only if needed
-   - call `diffbot/discussion` for changed topics
-   - call `gemini/chat` with `gemini-3-flash-preview` for structured classification
-   - classify the run as `NONE`, `MINOR`, or `MATERIAL`
-5. Send an immediate Telegram alert only for newly material topics.
-6. Send a daily digest at `18:00 UTC` with all `MINOR` and `MATERIAL` changes since the prior digest.
-7. Update the public dashboard after every run.
+It exists to prove the operating loop live without weakening the production invariant.
 
-## Setup
+## What Is Proven Onchain
 
-1. Use Node 20:
-   ```bash
-   nvm use
-   ```
-2. Install JS dependencies:
-   ```bash
-   pnpm install
-   ```
-3. Copy `.env.example` to `.env` and fill in:
-   - Base RPC and signer keys
-   - deployer key for contract deployment
-   - deployed contract addresses
-   - `WSTETH_STETH_RATE_FEED_ADDRESS` for Base
-   - Uniswap API key
-   - Locus API key and wallet address
-   - Telegram bot token and chat id
-4. Run checks:
-   ```bash
-   pnpm run check
-   pnpm run test:unit
-   forge test
-   ```
+Ringfence proves, in a live deployment, that:
+
+- principal cannot be accessed by the agent
+- claimable yield is computed and enforced onchain
+- bounded claims execute successfully
+- real swaps occur via Uniswap on Base
+- `USDC` is transferred and used for paid APIs
+
+Example flow already executed:
+
+```text
+claim -> swap -> fund intelligence -> analyze -> broadcast
+```
+
+All transactions are public and verifiable.
+
+## Live Proof
+
+### Deployment Transactions
+
+- Production deploy: [`0x5281231090ea16672de457271d6d21f58be45f6937d945339868141234ed9adf`](https://basescan.org/tx/0x5281231090ea16672de457271d6d21f58be45f6937d945339868141234ed9adf)
+- Demo deploy: [`0xa022a43f7e4697ec7dca8720f9331c1fc7129a32153253c98e397725c8427e17`](https://basescan.org/tx/0xa022a43f7e4697ec7dca8720f9331c1fc7129a32153253c98e397725c8427e17)
+
+### Funding and Execution Transactions
+
+- Production `deposit(0.1 wstETH)`: [`0xb671e43360e6908afcc14bcf9da9f01666b7ffc0adff74aa99d146cb097d3ab4`](https://basescan.org/tx/0xb671e43360e6908afcc14bcf9da9f01666b7ffc0adff74aa99d146cb097d3ab4)
+- Demo `setAgent`: [`0x37092a43bbf2ed2c3521420a8abfea2068c7a9dbad9153aaa8cdea9f36e60cbe`](https://basescan.org/tx/0x37092a43bbf2ed2c3521420a8abfea2068c7a9dbad9153aaa8cdea9f36e60cbe)
+- Demo `setRecipientWhitelist`: [`0x10b015376d00e1fd27a599eda0de72bb3b2335c8cb02ad275b0b31956284195f`](https://basescan.org/tx/0x10b015376d00e1fd27a599eda0de72bb3b2335c8cb02ad275b0b31956284195f)
+- Demo `setPerTxCap(0.001 wstETH)`: [`0xda991465a5a8cf596ed360d0877da362434a219ebe88e96e6c3c6898dfb14b59`](https://basescan.org/tx/0xda991465a5a8cf596ed360d0877da362434a219ebe88e96e6c3c6898dfb14b59)
+- Demo `approve(0.01 wstETH)`: [`0x13c5daf5c278c1d0dc28d2280a0b3b015ebd6cf14f5cd7899573594da3d5809b`](https://basescan.org/tx/0x13c5daf5c278c1d0dc28d2280a0b3b015ebd6cf14f5cd7899573594da3d5809b)
+- Demo `deposit(0.01 wstETH)`: [`0x23e4ce117a343aa5fe56bfc673f72075f5835fdaaeab316e8db5d76beb8b3de8`](https://basescan.org/tx/0x23e4ce117a343aa5fe56bfc673f72075f5835fdaaeab316e8db5d76beb8b3de8)
+- Demo `demoGrantSpendableDelta(0.0015 stETH-value)`: [`0xc1565efd81fb20557361afad4ce9525a935708726be0a5ea82eb33f2c41207d3`](https://basescan.org/tx/0xc1565efd81fb20557361afad4ce9525a935708726be0a5ea82eb33f2c41207d3)
+- Demo `claim(0.001 wstETH)`: [`0x0f0c56e92a873cb0c0672ed1dcbfb5a11f0d6d18411846eb8ae06e5063b26068`](https://basescan.org/tx/0x0f0c56e92a873cb0c0672ed1dcbfb5a11f0d6d18411846eb8ae06e5063b26068)
+- Uniswap Base swap: [`0x6451fb28ec1468499c20951bca51466ad0d29a1e201b6b054d5baa9a3f680328`](https://basescan.org/tx/0x6451fb28ec1468499c20951bca51466ad0d29a1e201b6b054d5baa9a3f680328)
+- Locus top-up: [`0xf5fa1a9930ab958c8144132769a9616db08e8cd706e5818a0400544ab75e3e93`](https://basescan.org/tx/0xf5fa1a9930ab958c8144132769a9616db08e8cd706e5818a0400544ab75e3e93)
+
+### Current Live State Snapshot (as of Sun, March 22nd 23:00 UTC)
+
+- Production vault: `0.1 wstETH`
+- Production principal baseline: `0.122999872513851591 stETH-value`
+- Production claimable: `0`
+- Demo vault: `0.009 wstETH`
+- Demo principal baseline: `0.012299987251385159 stETH-value`
+- Demo effective baseline: `0.010799987251385159 stETH-value`
+- Demo claimable after one claim: `0.000219 wstETH`
+
+## Dashboard
+
+The system exposes a public, read-only dashboard showing:
+
+- vault balance and principal baseline
+- current position value and claimable yield
+- Locus `USDC` buffer
+- recent runs (`NONE`, `MINOR`, `MATERIAL`)
+- governance topic summaries
+- alerts and daily digests
+- transaction history
+- system heartbeat
+
+The dashboard reflects the live state of the agent and treasury.
 
 ## CLI
 
-### State and owner actions
+### Core
 
-- `pnpm run cli -- state --contract production`
-- `pnpm run cli -- owner deposit --contract demo --amount 0.05`
-- `pnpm run cli -- owner set-agent --contract demo --agent 0x...`
-- `pnpm run cli -- owner whitelist --contract demo --recipient 0x... --allowed true`
-- `pnpm run cli -- owner set-cap --contract demo --amount 0.01`
-- `pnpm run cli -- owner demo-grant-delta --amount 0.005`
-- `pnpm run cli -- owner demo-reset-delta`
+```bash
+pnpm run cli -- state --contract production
+pnpm run cli -- owner deposit --contract demo --amount 0.05
+pnpm run cli -- owner set-agent --contract demo --agent 0x...
+pnpm run cli -- owner whitelist --contract demo --recipient 0x... --allowed true
+pnpm run cli -- owner set-cap --contract demo --amount 0.01
+pnpm run cli -- owner demo-grant-delta --amount 0.005
+pnpm run cli -- owner demo-reset-delta
+```
 
-### Low-level treasury debugging
+### Agent
 
-- `pnpm run cli -- demo fail-claim --contract demo --amount 1 --recipient 0x...`
-- `pnpm run cli -- agent claim --contract demo`
-- `pnpm run cli -- agent approve-swap --amount 0.005`
-- `pnpm run cli -- agent swap --amount 0.005`
-- `pnpm run cli -- agent topup-locus --amount 5`
+```bash
+pnpm run cli -- agent claim --contract demo
+pnpm run cli -- agent approve-swap --amount 0.005
+pnpm run cli -- agent swap --amount 0.005
+pnpm run cli -- agent topup-locus --amount 5
+```
 
-### Governance monitor
+### Monitor
 
-- `pnpm run cli -- monitor preflight --contract demo`
-- `pnpm run cli -- monitor hourly --contract demo`
-- `pnpm run cli -- monitor digest --contract demo`
-- `pnpm run serve`
+```bash
+pnpm run cli -- monitor hourly --contract demo
+pnpm run cli -- monitor digest --contract demo
+pnpm run cli -- monitor preflight --contract demo
+pnpm run serve
+```
 
-## Dashboard Service
+### Diagnostics
 
-Default local service:
-- public dashboard: `GET /`
-- admin page: `GET /admin?token=...`
-- public state: `GET /api/public/state`
-- public run history: `GET /api/public/runs`
-- public digests: `GET /api/public/digests`
-- admin hourly trigger: `POST /api/admin/monitor/hourly`
-- admin digest trigger: `POST /api/admin/monitor/digest`
-- admin preflight: `POST /api/admin/monitor/preflight`
+```bash
+pnpm run cli -- demo fail-claim --contract demo --amount 1 --recipient 0x...
+pnpm run cli -- locus smoke --topic-url https://research.lido.fi/t/... 
+```
 
-Admin endpoints require `DASHBOARD_ADMIN_TOKEN`.
+## Key Design Decisions
+
+### Value-Based Accounting (`stETH`)
+
+`wstETH` does not rebase. Value accrues through the exchange rate, so Ringfence accounts for principal in `stETH`-value terms rather than raw wrapped balance.
+
+### Buffer-Driven Spending
+
+The agent does not claim continuously. It claims only when the offchain budget actually needs replenishment.
+
+### Separation of Concerns
+
+- `RingfenceProduction` = the invariant
+- `RingfenceDemoHarness` = the execution surface
+
+### No Custody Risk
+
+The agent cannot access principal under any condition. It can only claim spendable yield within explicit onchain bounds.
+
+## Setup
+
+```bash
+nvm use
+pnpm install
+cp .env.example .env
+pnpm run check
+pnpm run test:unit
+forge test
+```
+
+Fill `.env` with:
+
+- Base RPC and signer keys
+- deployer key for contract deployment
+- deployed contract addresses
+- Uniswap API key
+- Locus API key and wallet address
+- Telegram bot token and chat id
 
 ## Deployment
-
-Deploy both contracts with Foundry:
 
 ```bash
 forge script script/DeployRingfence.s.sol:DeployRingfence \
@@ -148,10 +299,7 @@ forge script script/DeployRingfence.s.sol:DeployRingfence \
   --broadcast
 ```
 
-The deploy script writes `config/deployments.json`, which the CLI and monitor service consume.
-`config/deployments.json` and `config/runtime-state.json` are generated local artifacts and are intentionally gitignored.
-
-Optional verification on BaseScan with Foundry:
+Optional BaseScan verification:
 
 ```bash
 forge verify-contract --watch \
@@ -162,20 +310,8 @@ forge verify-contract --watch \
   contracts/RingfenceProduction.sol:RingfenceProduction
 ```
 
-For the live monitor demo, keep `MIN_CLAIM_AMOUNT_WSTETH` below your expected refill size. The template defaults to `0.001` `wstETH` so small demo refills are not blocked.
-
-## Live Product Notes
-
-- Production proves the canonical value-based `wstETH` accounting model.
-- On Base, the contracts use the `wstETH/stETH` rate feed because the bridged Base token does not expose the mainnet wrapper conversion helpers.
-- The demo harness is the default funding source for the live judging window.
-- The monitor is intentionally Classic-only on Uniswap by request shaping; any non-Classic route aborts loudly.
-- Locus defaults to beta unless production credentials are explicitly configured.
-- Telegram replaces Resend for outbound operator notifications.
-- The public dashboard is read-only. Manual reruns and digest sends stay behind the admin token.
-
 ## References
 
-- [Uniswap Trading API integration guide](https://api-docs.uniswap.org/guides/integration_guide)
-- [Locus Quick Start (Beta)](https://docs.paywithlocus.com/quickstart-beta)
-- [Lido governance forum](https://research.lido.fi/)
+- [Uniswap Trading API](https://api-docs.uniswap.org/)
+- [Locus Docs](https://docs.paywithlocus.com/)
+- [Lido Governance Forum](https://research.lido.fi/)

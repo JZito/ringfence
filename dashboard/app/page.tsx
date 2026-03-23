@@ -75,7 +75,6 @@ export default function DashboardPage() {
 
           <TreasuryCard
             vault={data.production}
-            protection={data.treasuryProtectionSummary.production}
             locusBalance={data.locusBalance}
             locusWalletAddress={data.locusWalletAddress}
           />

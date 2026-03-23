@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { relativeTime } from "../lib/format";
+import { relativeTime, relativeTimeUntil } from "../lib/format";
 import type { AgentStatus, MaterialAlertRecord } from "../lib/types";
 import { AgentStatusBadge } from "./status-badge";
 
@@ -17,7 +17,7 @@ export function StatusStrip({
   latestAlert,
 }: StatusStripProps) {
   return (
-    <div className="bg-bg-card border border-border rounded-lg px-5 py-3 flex items-center gap-4 flex-wrap shadow-glow">
+    <div className={`bg-bg-card border rounded-lg px-5 py-3 flex items-center gap-4 flex-wrap ${agentStatus === "healthy" ? "border-accent-green/20 animate-border_glow" : "border-border shadow-glow"}`}>
       <Image
         src="/hoo_bot_pfp.png"
         alt="Hoo"
@@ -28,6 +28,9 @@ export function StatusStrip({
       <div className="flex items-center gap-2">
         <span className="text-xs text-text-muted uppercase tracking-wider">Hoo</span>
         <AgentStatusBadge status={agentStatus} />
+        <span className="text-[11px] text-text-muted italic hidden sm:inline">
+          Watching Lido governance and funding itself from yield
+        </span>
       </div>
       <div className="h-4 w-px bg-border" />
       <div className="flex items-center gap-2">
@@ -44,6 +47,14 @@ export function StatusStrip({
             {lastHourlyRunAt ? relativeTime(lastHourlyRunAt) : "never"}
           </span>
         </span>
+        {lastHourlyRunAt && (
+          <span>
+            Next check:{" "}
+            <span className="text-text-primary font-mono">
+              {relativeTimeUntil(lastHourlyRunAt, 60)}
+            </span>
+          </span>
+        )}
         <span>
           Last digest:{" "}
           <span className="text-text-primary font-mono">

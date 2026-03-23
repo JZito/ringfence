@@ -641,11 +641,11 @@ export async function sendOperatorTelegramStep(input: {
     const balance = await getVerifiedLocusBalance(input.config);
     balanceFooter = [
       "",
-      `<b>Locus balance</b>`,
-      `<a href="https://basescan.org/address/${balance.data.wallet_address}">${escapeTelegramHtml(formatLocusBalanceDisplay(balance.data))}</a>`,
+      "────────────",
+      `<a href="https://basescan.org/address/${balance.data.wallet_address}"><b>Locus balance</b>: ${escapeTelegramHtml(formatLocusBalanceDisplay(balance.data))}</a>`,
     ].join("\n");
   } catch {
-    balanceFooter = ["", "<b>Locus balance</b>", "Unavailable"].join("\n");
+    balanceFooter = ["", "────────────", "<b>Locus balance</b>: Unavailable"].join("\n");
   }
 
   const messageHtml = [

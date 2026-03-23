@@ -12,7 +12,7 @@ export function RecentTopics({ topics }: RecentTopicsProps) {
   return (
     <SectionShell title="Recent Topics" subtitle="Latest monitored governance discussions">
       {visible.length === 0 ? (
-        <p className="text-sm text-text-muted">No changed topics recorded yet.</p>
+        <p className="text-sm text-text-muted">No governance activity detected in monitoring window</p>
       ) : (
         <div className="space-y-3">
           {visible.map((topic) => (
@@ -40,6 +40,11 @@ export function RecentTopics({ topics }: RecentTopicsProps) {
                 </span>
               </div>
               <p className="text-xs text-text-muted mt-1 line-clamp-2">{topic.summary}</p>
+              {topic.whyItMatters && (
+                <p className="text-[11px] text-text-muted italic mt-1">
+                  Why it matters: <span className="text-text-primary not-italic">{topic.whyItMatters}</span>
+                </p>
+              )}
               <div className="flex items-center gap-2 mt-1.5 flex-wrap">
                 {topic.riskTags.map((tag) => (
                   <span

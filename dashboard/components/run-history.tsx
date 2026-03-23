@@ -17,7 +17,7 @@ export function RunHistory({ runs }: RunHistoryProps) {
   return (
     <SectionShell title="Run History" subtitle="Bot activity log">
       {visible.length === 0 ? (
-        <p className="text-sm text-text-muted">No runs recorded yet.</p>
+        <p className="text-sm text-text-muted">Awaiting first monitor cycle</p>
       ) : (
         <div className="space-y-2">
           {visible.map((run) => (

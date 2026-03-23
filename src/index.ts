@@ -125,11 +125,36 @@ async function main() {
     .requiredOption("--recipient <address>", "recipient address")
     .action(async (options) => {
       const { agentFailClaim } = await import("./contracts.js");
-      await agentFailClaim(
+      const result = await agentFailClaim(
         getConfig(),
         parseContractKind(options.contract),
         parseTokenAmount(options.amount),
         parseAddress(options.recipient, "recipient"),
+      );
+
+      const likelyCause =
+        result.violations.length > 0 ? result.violations.join(", ") : "unknown_revert_path";
+
+      console.log("[OK] fail-claim: Claim reverted as expected");
+      console.log(
+        JSON.stringify(
+          {
+            step: "fail-claim",
+            status: "ok",
+            message: "Claim reverted as expected",
+            contractKind: options.contract,
+            amount: result.amount.toString(),
+            recipient: result.recipient,
+            recipientWhitelisted: result.recipientWhitelisted,
+            claimableAmount: result.stateBefore.claimableAmount.toString(),
+            perTxCap: result.stateBefore.perTxCap.toString(),
+            likelyCause,
+            violations: result.violations,
+            rawReason: result.reason,
+          },
+          null,
+          2,
+        ),
       );
     });
 

@@ -339,6 +339,13 @@ export async function agentFailClaim(
   const publicClient = getPublicClient(config);
   const { account } = getAgentWallet(config);
   const contractAddress = getContractAddress(config, contractKind);
+  const stateBefore = await readVaultState(config, contractKind);
+  const recipientWhitelisted = await publicClient.readContract({
+    address: contractAddress,
+    abi: getContractAbi(contractKind),
+    functionName: "isRecipientWhitelisted",
+    args: [recipient],
+  });
   const data = encodeFunctionData({
     abi: getContractAbi(contractKind),
     functionName: "claim",
@@ -357,6 +364,26 @@ export async function agentFailClaim(
     if (message.includes("Expected revert, but eth_call simulation succeeded")) {
       throw error;
     }
-    return { reverted: true, reason: message };
+
+    const violations: string[] = [];
+    if (!recipientWhitelisted) {
+      violations.push("recipient_not_whitelisted");
+    }
+    if (stateBefore.perTxCap > 0n && amount > stateBefore.perTxCap) {
+      violations.push("amount_exceeds_per_tx_cap");
+    }
+    if (amount > stateBefore.claimableAmount) {
+      violations.push("amount_exceeds_claimable");
+    }
+
+    return {
+      reverted: true,
+      reason: message,
+      amount,
+      recipient,
+      stateBefore,
+      recipientWhitelisted,
+      violations,
+    };
   }
 }

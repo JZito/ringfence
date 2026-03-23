@@ -5,7 +5,6 @@ import { SectionShell } from "./section-shell";
 
 interface TreasuryCardProps {
   vault?: VaultState;
-  protection?: string;
   locusBalance?: string;
   locusWalletAddress?: string;
 }
@@ -21,12 +20,11 @@ function Row({ label, children }: { label: string; children: React.ReactNode }) 
 
 export function TreasuryCard({
   vault,
-  protection,
   locusBalance,
   locusWalletAddress,
 }: TreasuryCardProps) {
   return (
-    <SectionShell title="Treasury Overview" subtitle="Onchain state — source of truth">
+    <SectionShell title="Treasury Overview" subtitle="Onchain state — the agent can only access yield, never principal">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-3">
           <h3 className="text-xs text-text-muted uppercase tracking-wider">Production Vault</h3>
@@ -46,17 +44,15 @@ export function TreasuryCard({
               </Row>
               <Row label="Claimable Amount">
                 <span className={`font-mono text-sm ${vault.claimableAmount !== "0" ? "text-accent-green" : "text-text-muted"}`}>
-                  {formatWstETH(vault.claimableAmount)} wstETH
+                  {vault.claimableAmount !== "0"
+                    ? `${formatWstETH(vault.claimableAmount)} wstETH`
+                    : "Awaiting yield accrual"}
                 </span>
+                <div className="text-[10px] text-text-muted mt-0.5">Derived from current oracle rate</div>
               </Row>
               <Row label="Per-Tx Cap">
                 <span className="font-mono text-sm text-text-muted">{formatWstETH(vault.perTxCap)} wstETH</span>
               </Row>
-              {protection && (
-                <Row label="Protection">
-                  <span className="text-xs text-text-muted">{protection}</span>
-                </Row>
-              )}
             </div>
           ) : (
             <div className="text-text-muted text-sm">No vault configured</div>
