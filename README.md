@@ -17,6 +17,19 @@ This repository runs Ringfence as a **live system**:
 >
 > Every step in the loop is executed with real assets, real APIs, and publicly verifiable transactions.
 
+## At A Glance
+
+| Layer | Live choice |
+| --- | --- |
+| Backing asset | `wstETH` on Base |
+| Spend asset | `USDC` on Base |
+| Principal control | Onchain baseline accounting + owner-only withdrawal |
+| Spend control | Agent-only claim + whitelist + per-tx cap |
+| Swap rail | Uniswap Trading API |
+| Paid intelligence | Locus + Diffbot + Gemini |
+| Broadcast channel | Telegram |
+| Public surface | Vercel dashboard |
+
 ## Why Ringfence
 
 Most agent systems today:
@@ -175,6 +188,14 @@ claim -> swap -> fund intelligence -> analyze -> broadcast
 All transactions are public and verifiable.
 
 ## Live Proof
+
+| Proof surface | Live artifact |
+| --- | --- |
+| Production primitive | Verified Base deployment with funded vault |
+| Demo execution surface | Verified Base deployment with explicit demo delta |
+| Real swap execution | Base tx via Uniswap Trading API |
+| Paid offchain analysis | Locus-funded Diffbot + Gemini calls |
+| Operator broadcast | Telegram alert + digest |
 
 ### Deployment Transactions
 
