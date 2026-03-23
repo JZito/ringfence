@@ -387,3 +387,69 @@ export async function agentFailClaim(
     };
   }
 }
+
+export async function agentFailWithdrawPrincipal(
+  config: RingfenceConfig,
+  contractKind: ContractKind,
+  amount: bigint,
+  recipient: Address,
+) {
+  const publicClient = getPublicClient(config);
+  const { account, walletClient } = getAgentWallet(config);
+  const contractAddress = getContractAddress(config, contractKind);
+  const stateBefore = await readVaultState(config, contractKind);
+  const data = encodeFunctionData({
+    abi: getContractAbi(contractKind),
+    functionName: "withdrawPrincipal",
+    args: [amount, recipient],
+  });
+
+  let reason: string | undefined;
+  try {
+    await publicClient.call({
+      account: account.address,
+      to: contractAddress,
+      data,
+    });
+    throw new Error("Expected revert, but eth_call simulation succeeded");
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : String(error);
+    if (message.includes("Expected revert, but eth_call simulation succeeded")) {
+      throw error;
+    }
+    reason = message;
+  }
+
+  const tx = await sendContractCall({
+    publicClient,
+    walletClient,
+    account,
+    address: contractAddress,
+    abi: getContractAbi(contractKind),
+    functionName: "withdrawPrincipal",
+    args: [amount, recipient],
+    step: `${contractKind}-fail-withdraw-principal`,
+    simulate: false,
+    allowRevert: true,
+    gas: 150_000n,
+  });
+
+  if (tx.receipt.status === "success") {
+    throw new Error(`Expected unauthorized withdrawPrincipal to revert, but tx succeeded: ${tx.hash}`);
+  }
+
+  const stateAfter = await readVaultState(config, contractKind);
+
+  return {
+    reverted: true,
+    txHash: tx.hash,
+    amount,
+    recipient,
+    agent: account.address,
+    owner: stateBefore.owner,
+    reason,
+    likelyCause: account.address.toLowerCase() !== stateBefore.owner.toLowerCase() ? "caller_is_not_owner" : "unknown",
+    stateBefore,
+    stateAfter,
+  };
+}

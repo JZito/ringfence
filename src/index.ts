@@ -116,9 +116,8 @@ async function main() {
     await ownerResetDemoDelta(getConfig());
   });
 
-  program
-    .command("demo")
-    .description("Demo utilities")
+  const demo = program.command("demo").description("Demo utilities");
+  demo
     .command("fail-claim")
     .requiredOption("--contract <kind>", "production or demo")
     .requiredOption("--amount <amount>", "wstETH amount in decimal units")
@@ -151,6 +150,48 @@ async function main() {
             likelyCause,
             violations: result.violations,
             rawReason: result.reason,
+          },
+          null,
+          2,
+        ),
+      );
+    });
+
+  demo
+    .command("fail-withdraw-principal")
+    .requiredOption("--contract <kind>", "production or demo")
+    .requiredOption("--amount <amount>", "wstETH amount in decimal units")
+    .requiredOption("--recipient <address>", "recipient address")
+    .action(async (options) => {
+      const { agentFailWithdrawPrincipal } = await import("./contracts.js");
+      const result = await agentFailWithdrawPrincipal(
+        getConfig(),
+        parseContractKind(options.contract),
+        parseTokenAmount(options.amount),
+        parseAddress(options.recipient, "recipient"),
+      );
+
+      console.log("[OK] fail-withdraw-principal: Unauthorized withdraw reverted onchain as expected");
+      console.log(
+        JSON.stringify(
+          {
+            step: "fail-withdraw-principal",
+            status: "ok",
+            message: "Unauthorized withdraw reverted onchain as expected",
+            contractKind: options.contract,
+            txHash: result.txHash,
+            amount: result.amount.toString(),
+            recipient: result.recipient,
+            agent: result.agent,
+            owner: result.owner,
+            likelyCause: result.likelyCause,
+            rawReason: result.reason,
+            principalBaselineBefore: result.stateBefore.principalBaseline.toString(),
+            principalBaselineAfter: result.stateAfter.principalBaseline.toString(),
+            vaultBalanceBefore: result.stateBefore.vaultBalanceWstETH.toString(),
+            vaultBalanceAfter: result.stateAfter.vaultBalanceWstETH.toString(),
+            claimableBefore: result.stateBefore.claimableAmount.toString(),
+            claimableAfter: result.stateAfter.claimableAmount.toString(),
           },
           null,
           2,
