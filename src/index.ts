@@ -10,6 +10,7 @@ import {
   ownerSetPerTxCap,
   ownerSetWhitelist,
 } from "./contracts.js";
+import { normalizeCliArgv } from "./cli-argv.js";
 import { loadEnvFiles } from "./env.js";
 import { parseTokenAmount } from "./format.js";
 import { runLocusSmoke } from "./locus-smoke.js";
@@ -274,7 +275,7 @@ async function main() {
     await startDashboardService(getConfig());
   });
 
-  await program.parseAsync(process.argv);
+  await program.parseAsync(normalizeCliArgv(process.argv));
 }
 
 main().catch((error) => {
