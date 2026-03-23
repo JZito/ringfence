@@ -122,6 +122,12 @@ Ringfence combines an **onchain treasury invariant** with an **offchain agent ru
 - Telegram broadcasting
 - persistent monitor state and public dashboard
 
+## Documentation
+
+- [Architecture notes](docs/architecture.md)
+- [Demo script](docs/demo-script.md)
+- [Conversation log](docs/conversation-log.md)
+
 ## Contracts
 
 ### `RingfenceProduction`
