@@ -1,6 +1,6 @@
 # Ringfence
 
-**Ringfence is a yield-backed operating treasury for AI agents separating capital from computation.**
+**Ringfence is a yield-backed operating treasury for AI agents that separates capital from computation.**
 
 It separates **principal from yield**, enforces that separation **onchain**, and allows agents to fund ongoing compute, data, and communication costs without ever being able to spend the underlying capital.
 
@@ -164,7 +164,7 @@ Ringfence proves, in a live deployment, that:
 - claimable yield is computed and enforced onchain
 - bounded claims execute successfully
 - real swaps occur via Uniswap on Base
-- `USDC` is transferred and used for paid APIs
+- `USDC` is transferred onchain for paid API usage
 
 Example flow already executed:
 
